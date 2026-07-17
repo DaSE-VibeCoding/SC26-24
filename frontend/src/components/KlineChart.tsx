@@ -97,7 +97,27 @@ export function KlineChart({ detail }: { detail: StockDetail }) {
       ],
       dataZoom: [
         { type: 'inside', xAxisIndex: [0, 1], start: 50, end: 100 },
-        { type: 'slider', xAxisIndex: [0, 1], start: 50, end: 100, bottom: 24, height: 16, borderColor: '#203249', backgroundColor: '#0F1B2D', fillerColor: 'rgba(108,124,255,0.12)' },
+        {
+          type: 'slider',
+          xAxisIndex: [0, 1],
+          start: 50,
+          end: 100,
+          bottom: 24,
+          height: 16,
+          borderColor: '#203249',
+          backgroundColor: '#0F1B2D',
+          fillerColor: 'rgba(108,124,255,0.12)',
+          handleStyle: { color: '#6C7CFF', borderColor: '#6C7CFF' },
+          selectedDataBackground: {
+            lineStyle: { color: '#6C7CFF', opacity: 0.2 },
+            areaStyle: { color: 'rgba(108,124,255,0.08)' },
+          },
+          dataBackground: {
+            lineStyle: { color: '#40546f', opacity: 0.15 },
+            areaStyle: { color: 'transparent' },
+          },
+          textStyle: { color: '#8FA1B8' },
+        },
       ],
       series: [
         // ── 蜡烛图 ──

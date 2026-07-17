@@ -152,11 +152,12 @@
 
 ## 2026-07-17 — 用户偏好（待收集）
 
-- 用户对因子 UI 的偏好：尚未讨论
-- 用户对颜色方案的偏好：需求文档已指定，待确认是否严格执行
+- 用户对因子 UI 的偏好：按需求文档执行
+- 用户对颜色方案的偏好：严格执行需求文档 Design Tokens
 - 用户对移动端的要求：需求文档为"基本可读"
-- 用户是否允许修改 package.json：待确认
-- 用户是否允许修改 vite.config.ts：待确认
+- 用户允许修改后端 Schema（"API扩展我负责"）
+- 后端因子列表以需求文档为准
+- 用户使用 conda 环境 `sqxx`，中转代理端口 7897
 
 ---
 
@@ -164,15 +165,15 @@
 
 | # | 事项 | 优先级 | 状态 |
 |---|---|---|---|
-| 1 | Git local user.name / user.email | P0 | 等待用户提供 |
-| 2 | GitHub 仓库确认 | P0 | 等待用户确认 |
-| 3 | 开发分支名称 `feat/frontend-dashboard` | P0 | 等待用户确认 |
-| 4 | 因子列表权威来源（需求 vs 后端） | P0 | 等待团队 (C) |
-| 5 | API Schema 扩展责任方 | P0 | 等待团队 |
-| 6 | 设计 Token 颜色确认 | P1 | 等待用户 |
-| 7 | api.ts Adapter 模式 | P1 | 等待 A+D 协商 |
-| 8 | 默认模型确认 | P1 | 等待团队 (C) |
-| 9 | package.json/vite.config 修改授权 | P1 | 等待用户 |
+| 1 | Git local user.name / user.email | P0 | ✅ Sunsume / xiamin21111@163.com |
+| 2 | GitHub 仓库确认 | P0 | ✅ cjkzbl/alphascope-stock-picker |
+| 3 | 开发分支名称 `feat/frontend-dashboard` | P0 | ✅ 已创建 |
+| 4 | 因子列表权威来源 | P0 | ✅ 按需求文档，已更新后端 features.py |
+| 5 | API Schema 扩展责任方 | P0 | ✅ A 负责，已更新 schemas.py |
+| 6 | 设计 Token 颜色确认 | P1 | ✅ 按需求文档执行 |
+| 7 | api.ts Adapter 模式 | P1 | 待 A+D 协商 |
+| 8 | 默认模型确认 | P1 | ✅ hist_gradient_boosting |
+| 9 | package.json/vite.config 修改授权 | P1 | 仅 package-lock.json (npm install 更新) |
 | 10 | 测试覆盖率要求 | P2 | Phase 5 前确认 |
 
 ---
@@ -185,13 +186,38 @@ _（暂无）_
 
 ## 已提交 Commit
 
-_（暂无，Phase 0 尚未创建提交）_
+```
+462b30c feat(frontend): refactor app shell and all business components
+5b5249d feat(frontend): add design tokens, shared types, API layer, and format utilities
+fad1a1a feat(backend): align API schema and factor definitions with requirements doc
+b2a0271 docs(agent): add project context, execution plan, and memory
+```
+
+分支：`feat/frontend-dashboard`，领先 `main` 4 commits
 
 ---
 
 ## 已推送状态
 
-_（暂无）_
+尚未推送（等待用户授权）
+
+---
+
+## Phase 1 完成总结（2026-07-17）
+
+1. Git local 身份已配置：Sunsume / xiamin21111@163.com
+2. 开发分支 `feat/frontend-dashboard` 已创建
+3. 后端 Schema 与需求文档对齐（12 因子、模型指标、状态枚举等）
+4. 前端 Design Tokens 按需求文档全面修正（#6C7CFF 主色等）
+5. TypeScript 类型扩展（ModelMetrics, ModelStatus, RiskLevel 等）
+6. API 层重构（超时、409、ApiError）
+7. 6 卡市场概览、分组因子多选、模型指标摘要已实现
+8. 13 列行情表 50 行分页、6 种筛选控件已实现
+9. 配置变更检测、旧结果保留逻辑已实现
+10. Mock 数据 50 只股票覆盖各场景
+11. `npm run build` 和 `npm test` 通过
+12. D 的 KlineChart / StockDrawer 未修改
+13. 前后端均启动成功，页面可访问 http://127.0.0.1:5173/
 
 ---
 

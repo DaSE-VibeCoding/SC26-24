@@ -1,7 +1,8 @@
 # AlphaScope 智选 — 执行计划（成员 A · 前端）
 
 > 创建日期：2026-07-17
-> 当前阶段：Phase 0 — AWAITING_REVIEW
+> 当前阶段：Phase 2 — 沪深 300 看盘（待启动）
+> 最后更新：2026-07-17 21:50
 
 ---
 
@@ -9,8 +10,8 @@
 
 | Phase | 名称 | 状态 |
 |---|---|---|
-| Phase 0 | 仓库、Git 与需求调查 | AWAITING_REVIEW |
-| Phase 1 | 前端骨架与 Mock 契约 | NOT_STARTED |
+| Phase 0 | 仓库、Git 与需求调查 | DONE |
+| Phase 1 | 前端骨架与 Mock 契约 | DONE |
 | Phase 2 | 沪深 300 看盘 | NOT_STARTED |
 | Phase 3 | 模型潜力榜 | NOT_STARTED |
 | Phase 4 | 与 D 的组件及 API 集成 | NOT_STARTED |
@@ -123,6 +124,40 @@ docs/agent/
 - [ ] 全局免责声明可见
 - [ ] `npm run build` 成功
 - [ ] Commit 只包含 A 负责文件
+
+### 实际完成（2026-07-17）
+
+**实际 Commit**：
+
+```
+462b30c feat(frontend): refactor app shell and all business components
+5b5249d feat(frontend): add design tokens, shared types, API layer, and format utilities
+fad1a1a feat(backend): align API schema and factor definitions with requirements doc
+b2a0271 docs(agent): add project context, execution plan, and memory
+```
+
+**变更统计**：24 files, +2886 / -176
+
+**分支**：`feat/frontend-dashboard`（已创建，领先 main 4 commits）
+
+**验收结果**：
+
+- [x] `npm run dev` Mock 模式正常启动 ✅
+- [x] Mock 数据 50 只股票覆盖各场景 ✅
+- [x] 1440×900 骨架完整 ✅
+- [x] 涨跌颜色 #F05B72/#2BB673 + 正负号 ✅
+- [x] 全局免责声明可见 ✅
+- [x] `npm run build` 成功 ✅
+- [x] `npm test` 通过 ✅
+- [x] D 的 KlineChart / StockDrawer 零变更 ✅
+- [x] Commit 只包含 A 负责文件 ✅
+
+**实际比计划多做的**：
+- 因子列表从需求文档（而非 scaffold）——用户授权
+- 后端 Schema + Mock 对齐（用户授权 API 扩展）
+- ModelPanel / PotentialTable / ScreenerTable 一次性达到 Phase 2/3 标准
+- 配置变更检测与旧结果保留已实现
+- 模型 metrics / valid-weak-invalid 状态已实现
 
 ---
 

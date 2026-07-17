@@ -148,6 +148,8 @@ AlphaScope 是一个面向研究与演示的沪深 300 看盘及机器学习选�
 | StockDrawer | `src/components/StockDrawer.tsx` | Props 接口、入口（open + onClose + symbol） | 内部实现 |
 | KlineChart | `src/components/KlineChart.tsx` | 无 | 完整实现 |
 
+> 2026-07-17 边界例外：用户两次直接授权成员 A 优化 `KlineChart`，当前专业 K 线实现及本轮交互增强由 A 完成；后续如与 D 的版本合并，需以当前交互能力为验收基线并人工处理冲突。
+
 ### 公共文件
 
 | 文件 | 所有权 | 说明 |
@@ -223,6 +225,8 @@ AlphaScope 是一个面向研究与演示的沪深 300 看盘及机器学习选�
 ---
 
 ## 10. 视觉 Tokens
+
+> 2026-07-17 用户主题覆盖：用户明确要求整体切换为 macOS 系统样式和配色。当前实现以浅色 macOS 风格为准（`#F5F5F7` 背景、半透明白色卡片、`#007AFF` 系统蓝、SF 字体栈和磨砂效果），本节原始深色 Tokens 仅保留为历史需求记录。A 股红涨绿跌方向不变，颜色更新为 macOS 系统红 `#FF3B30` / 系统绿 `#34C759`。
 
 ### 需求文档定义
 

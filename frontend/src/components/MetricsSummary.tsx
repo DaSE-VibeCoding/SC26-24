@@ -57,9 +57,9 @@ export function MetricsSummary({
             marginTop: 8,
             padding: '8px 12px',
             borderRadius: 8,
-            background: 'rgba(245,185,66,0.1)',
-            border: '1px solid rgba(245,185,66,0.25)',
-            color: '#F5B942',
+            background: 'rgba(255,159,10,0.08)',
+            border: '1px solid rgba(255,159,10,0.24)',
+            color: '#B66A00',
             fontSize: 13,
           }}
         >
@@ -72,9 +72,9 @@ export function MetricsSummary({
             marginTop: 8,
             padding: '8px 12px',
             borderRadius: 8,
-            background: 'rgba(240,91,114,0.1)',
-            border: '1px solid rgba(240,91,114,0.25)',
-            color: '#F05B72',
+            background: 'rgba(255,59,48,0.07)',
+            border: '1px solid rgba(255,59,48,0.22)',
+            color: '#D70015',
             fontSize: 13,
           }}
         >

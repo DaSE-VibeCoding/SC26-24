@@ -254,3 +254,120 @@ b2a0271 docs(agent): add project context, execution plan, and memory
    - 成交量红涨绿跌着色
    - DataZoom 滚轮+滑块、十字光标、图例切换 MA 线
    - Mock K 线数据改为随机游走，OHLC 逻辑正确
+
+---
+
+## 2026-07-17 — K 线与主页面第二轮体验优化
+
+**来源**：用户明确要求先读取本地记忆，再调查真实炒股软件并优化 K 线、主页面布局和配色；完成后更新本地记忆。
+
+**边界决策**：
+- 主页面、市场概览、主题和全局样式属于成员 A 负责范围。
+- `KlineChart` 原属成员 D，但本次用户再次明确授权直接修改；不扩展到后端计算、真实交易、StockDrawer 其余业务逻辑。
+
+**调研依据**：
+- TradingView Supercharts 官方帮助：上方工具条集中管理品种、周期、图表类型和指标；图表支持十字光标、价格/时间轴、缩放、全屏与多面板指标。
+- TradingView 官方图表类型说明：蜡烛图承载 OHLC，指标分为主图叠加和独立副图。
+- moomoo 官方手册与学习中心：主图/副图指标分层，常用均线组合覆盖短中长期，成交量用于辅助判断价格变动强度。
+
+**已确认设计决策**：
+1. K 线默认展示近 6 个月，并提供 3M / 6M / 1Y / 全部快速区间；数据仍为日 K、前复权语义，不虚构分时数据。
+2. 十字光标联动价格与成交量面板；顶部读数随指针更新日期、开高低收、涨跌幅和成交量。
+3. 主图显示 MA5 / MA20 / MA60，副图显示红涨绿跌成交量和 MAVOL5；均线基于完整历史数据计算后再按可见区间截取，避免 3M 视图的 MA60 大面积缺失。
+4. A 股继续使用 `#F05B72` 红涨、`#2BB673` 绿跌，并始终配合正负号；最新收盘价使用同方向价签。
+5. 页面从展示型大 Hero 改为信息密度更高的研究工作台：顶部为产品与数据状态，中部为六项市场广度指标，下方为独立工作区。
+6. 模型潜力榜保留配置 + 结果双栏；沪深 300 看盘切换后使用全宽表格，不再保留无关模型侧栏。
+7. 保留需求文档核心 Design Tokens，在不改变品牌色和涨跌色的前提下，新增深色中性背景、分层表面、弱边框和低对比网格，降低霓虹感。
+
+**修改文件**：
+- `frontend/src/App.tsx`
+- `frontend/src/components/KlineChart.tsx`
+- `frontend/src/components/MarketSummary.tsx`
+- `frontend/src/components/ModelPanel.tsx`（Ant Design 6 API 兼容清理）
+- `frontend/src/components/common/DataError.tsx`（Ant Design 6 API 兼容清理）
+- `frontend/src/styles.css`
+- `frontend/src/theme.ts`
+
+**验证结果**：
+- `npm run build`：通过；仅保留既有的大包体积提示。
+- `npm test`：3 个测试文件、30 项测试全部通过，Ant Design 弃用警告已清理。
+- `git diff --check`：通过。
+- 本地运行检查：前端 HTML、`/api/status`、`/api/market`、`/api/stocks/600519.SH` 均正常返回；个股接口包含完整 OHLCV bars。
+- macOS 屏幕截图因当前进程无录屏权限未生成，不影响代码构建和端口联调结果。
+
+**状态**：已完成，等待用户视觉反馈；未提交、未推送。
+
+---
+
+## 2026-07-17 — K 线缩放边界与 macOS 浅色主题
+
+**来源**：用户要求限制 K 线放大边界，并将整体配色风格改成 MacBook 系统样式和配色。
+
+**主题解释**：在用户未额外指定深色/浅色模式的情况下，采用辨识度更强的 macOS 浅色系统风格；保留 A 股红涨绿跌业务语义。该用户指令覆盖此前需求文档的深色 Design Tokens。
+
+**缩放决策**：
+- `KlineChart` 定义 `MIN_VISIBLE_BARS = 36`。
+- inside DataZoom 和 slider DataZoom 同时设置 `minValueSpan`，避免从滚轮或滑块绕过限制。
+- 当数据不足 36 根时，以实际数据量作为边界。
+- 蜡烛 `barMaxWidth` 从 13px 降至 10px，成交量柱从 11px 降至 9px。
+- 工具条明确显示“最少显示 36 根”，让交互约束可见。
+
+**macOS 视觉决策**：
+- 页面背景：`#F5F5F7`，叠加低对比系统蓝/青色环境光。
+- 卡片：半透明白色、saturate + blur 磨砂效果、柔和双层阴影、14px 圆角。
+- 主色：macOS 系统蓝 `#007AFF`；辅助色 `#30B0C7`。
+- A 股上涨/下跌：系统红 `#FF3B30` / 系统绿 `#34C759`。
+- 警告和均线：系统橙 `#FF9F0A`；MA5 `#0A84FF`；MA60 `#AF52DE`。
+- 字体：`-apple-system` / `SF Pro Text` / `SF Pro Display` / `PingFang SC`。
+- Segmented、按钮、表格、抽屉、K 线与因子雷达全部适配浅色表面。
+
+**修改范围**：
+- `frontend/src/theme.ts`
+- `frontend/src/styles.css`
+- `frontend/src/App.tsx`
+- `frontend/src/components/KlineChart.tsx`
+- `frontend/src/components/FactorProfile.tsx`
+- `frontend/src/components/PotentialTable.tsx`
+- `frontend/src/components/MetricsSummary.tsx`
+- `frontend/src/utils/format.ts`
+
+**验证结果**：
+- 旧深色核心色残留检索：无匹配。
+- `npm run build`：通过，仅保留既有的大包体积提示。
+- `npm test`：3 个测试文件、30 项测试全部通过。
+- `git diff --check`：通过。
+
+**状态**：已完成，等待用户视觉反馈；未提交、未推送。
+
+**后续反馈修正**：用户指出三色窗口控制点不适合 Web 页面。已移除该装饰；macOS 风格仅保留系统配色、字体、磨砂层次、圆角和阴影，不再模拟桌面窗口框架。
+
+---
+
+## 2026-07-17 — 因子截面画像表现力增强
+
+**来源**：用户反馈 K 线下方“因子当日截面百分位”表现力不足。
+
+**问题判断**：
+1. 原实现只有同形态的彩色进度条，缺少总体轮廓、重要信号和基准位置三个阅读层级。
+2. 原颜色规则把高百分位统一映射为暖色，容易让用户误以为所有因子都是“越高越好”。
+3. `vol_20`、`maxdd_60` 属于风险类因子，高百分位应表达为风险暴露更高，而不是表现更优。
+
+**设计决策**：
+- 新建 `FactorProfile.tsx`，将因子区从 `StockDrawer` 中拆出为独立组件。
+- 第一层使用六维雷达图展示动量、趋势、RSI、风险、量价、价格位置的分组均值。
+- 第二层突出两个最高的非风险因子，并单独展示综合风险百分位。
+- 第三层按分组展示详细因子，轨道包含 25/50/75 分位参照、中位线、当前位置点、分组均值和截面排名。
+- 文案改为“百分位表示相对位置，不直接等于预期收益”；风险类明确提示“越高代表风险暴露越高”。
+- 非风险因子使用中性蓝紫层级表示位置；风险因子使用绿/黄/红表达低/中/高暴露。
+
+**修改文件**：
+- `frontend/src/components/FactorProfile.tsx`（新增）
+- `frontend/src/components/StockDrawer.tsx`
+- `frontend/src/styles.css`
+
+**验证结果**：
+- `npm run build`：通过。
+- `npm test`：3 个测试文件、30 项测试全部通过。
+- `git diff --check`：通过。
+
+**状态**：已完成，等待用户视觉反馈；未提交、未推送。

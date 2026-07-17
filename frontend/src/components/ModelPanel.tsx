@@ -47,7 +47,7 @@ export function ModelPanel(props: Props) {
       extra={<span className="eyebrow">MODEL LAB</span>}
       className="full-height"
     >
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         {/* 模型选择 */}
         <div>
           <Typography.Text type="secondary">模型</Typography.Text>

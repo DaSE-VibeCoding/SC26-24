@@ -60,9 +60,9 @@ export const RISK_LABELS: Record<RiskLevel, string> = {
 }
 
 export const RISK_COLORS: Record<RiskLevel, string> = {
-  low: '#2BB673',
-  medium: '#F5B942',
-  high: '#F05B72',
+  low: '#34C759',
+  medium: '#FF9F0A',
+  high: '#FF3B30',
 }
 
 /**
@@ -75,9 +75,9 @@ export const MODEL_STATUS_LABELS: Record<ModelStatus, string> = {
 }
 
 export const MODEL_STATUS_COLORS: Record<ModelStatus, string> = {
-  valid: '#21D4B4',
-  weak: '#F5B942',
-  invalid: '#F05B72',
+  valid: '#30B0C7',
+  weak: '#FF9F0A',
+  invalid: '#FF3B30',
 }
 
 /**

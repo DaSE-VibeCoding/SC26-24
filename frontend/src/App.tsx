@@ -1,5 +1,6 @@
 import {
-  ExperimentOutlined,
+  BarChartOutlined,
+  DatabaseOutlined,
   GithubOutlined,
   RadarChartOutlined,
   ReloadOutlined,
@@ -15,11 +16,10 @@ import {
   Row,
   Segmented,
   Space,
-  Spin,
   Tag,
   Typography,
 } from 'antd'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from './api'
 import { MarketSummary } from './components/MarketSummary'
 import { MetricsSummary } from './components/MetricsSummary'
@@ -35,7 +35,6 @@ import { EmptyResult } from './components/common/EmptyResult'
 import { theme } from './theme'
 import type {
   MarketResponse,
-  ModelOption,
   OptionsResponse,
   PredictionResponse,
   StockDetail,
@@ -218,7 +217,7 @@ export default function App() {
             </div>
           </div>
 
-          <Space wrap>
+          <Space wrap className="topbar-actions">
             {/* 数据状态 */}
             {isMock && (
               <Tag color="orange" style={{ margin: 0 }}>
@@ -259,19 +258,19 @@ export default function App() {
 
         {/* ── Main ────────────────────────────────── */}
         <main className="content">
-          {/* Hero */}
-          <section className="hero">
-            <div>
-              <span className="eyebrow">QUANT RESEARCH CONSOLE</span>
-              <Typography.Title>
-                从多因子信号中，发现更值得关注的股票
-              </Typography.Title>
+          {/* 紧凑的研究工作台抬头 */}
+          <section className="market-intro">
+            <div className="market-intro-copy">
+              <span className="eyebrow">CSI 300 · QUANT RESEARCH</span>
+              <Typography.Title level={1}>沪深 300 多因子研究台</Typography.Title>
               <Typography.Paragraph>
-                在沪深 300 固定股票池内，组合常用技术因子与机器学习模型，生成可解释的候选排序。
+                聚合市场广度、多因子信号与模型验证，在同一工作区完成筛选和个股研判。
               </Typography.Paragraph>
             </div>
-            <div className="hero-orbit">
-              <ExperimentOutlined />
+            <div className="market-intro-meta" aria-label="研究台能力">
+              <span><DatabaseOutlined /> 固定股票池</span>
+              <span><BarChartOutlined /> 日线技术因子</span>
+              <span className="market-intro-meta--accent">研究结果非投资建议</span>
             </div>
           </section>
 
@@ -288,7 +287,7 @@ export default function App() {
                   className="mock-alert"
                   type="warning"
                   showIcon
-                  message="当前为 Mock 演示数据"
+                  title="当前为 Mock 演示数据"
                   description={market?.status.message}
                 />
               )}
@@ -305,108 +304,117 @@ export default function App() {
               {/* 市场概览 */}
               {market && <MarketSummary data={market} />}
 
-              {/* 双 Tab 工作区 */}
-              <Row gutter={[16, 16]} className="workspace">
-                {/* 左侧：模型面板 */}
-                <Col xs={24} xl={7}>
-                  {optionsLoading ? (
-                    <Card>
-                      <LoadingSkeleton rows={6} />
-                    </Card>
-                  ) : options ? (
-                    <ModelPanel
-                      factors={options.factors}
-                      models={options.models}
-                      selectedFactors={factors}
-                      model={model}
-                      topN={topN}
-                      loading={training}
-                      lastTrainedModel={lastTrained?.model}
-                      lastTrainedFactors={lastTrained?.factors}
-                      onFactors={setFactors}
-                      onModel={setModel}
-                      onTopN={setTopN}
-                      onRun={runModel}
-                    />
-                  ) : null}
-                </Col>
+              {/* 主工作区：模型页双栏、看盘页全宽 */}
+              <section className="workspace">
+                <div className="workspace-nav">
+                  <div>
+                    <span className="eyebrow">WORKSPACE</span>
+                    <h2>{view === '模型潜力榜' ? '模型候选与验证' : '沪深 300 全景看盘'}</h2>
+                    <p>
+                      {view === '模型潜力榜'
+                        ? '配置模型后查看样本外指标、候选排序和风险画像。'
+                        : '使用价格、趋势、波动和量价条件快速缩小研究范围。'}
+                    </p>
+                  </div>
+                  <Segmented
+                    value={view}
+                    onChange={(value) => setView(String(value))}
+                    options={['模型潜力榜', '沪深300看盘']}
+                  />
+                </div>
 
-                {/* 右侧：内容区 */}
-                <Col xs={24} xl={17}>
-                  <Card
-                    title={
-                      <Segmented
-                        value={view}
-                        onChange={(value) => setView(String(value))}
-                        options={['模型潜力榜', '沪深300看盘']}
-                      />
-                    }
-                    extra={
-                      predictions && view === '模型潜力榜' ? (
-                        <span className="muted">
-                          更新于 {dayjs(predictions.trained_at).format('HH:mm:ss')}
-                        </span>
-                      ) : null
-                    }
-                  >
-                    {view === '模型潜力榜' ? (
-                      predictionsLoading ? (
-                        <LoadingSkeleton table />
-                      ) : predictions ? (
-                        <>
-                          {/* 模型指标 */}
-                          <MetricsSummary
-                            status={predictions.status}
-                            metrics={predictions.metrics}
-                            trainedAt={predictions.trained_at}
-                            predictionDate={predictions.prediction_date}
-                            trainPeriod={predictions.train_period}
-                            testPeriod={predictions.test_period}
-                            modelName={
-                              options?.models.find((m) => m.key === predictions.model)
-                                ?.label ?? predictions.model
-                            }
-                          />
+                {view === '模型潜力榜' ? (
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} xl={7}>
+                      {optionsLoading ? (
+                        <Card className="workspace-card">
+                          <LoadingSkeleton rows={6} />
+                        </Card>
+                      ) : options ? (
+                        <ModelPanel
+                          factors={options.factors}
+                          models={options.models}
+                          selectedFactors={factors}
+                          model={model}
+                          topN={topN}
+                          loading={training}
+                          lastTrainedModel={lastTrained?.model}
+                          lastTrainedFactors={lastTrained?.factors}
+                          onFactors={setFactors}
+                          onModel={setModel}
+                          onTopN={setTopN}
+                          onRun={runModel}
+                        />
+                      ) : null}
+                    </Col>
+                    <Col xs={24} xl={17}>
+                      <Card
+                        className="workspace-card"
+                        title="候选排名"
+                        extra={predictions ? (
+                          <span className="muted">
+                            更新于 {dayjs(predictions.trained_at).format('HH:mm:ss')}
+                          </span>
+                        ) : null}
+                      >
+                        {predictionsLoading ? (
+                          <LoadingSkeleton table />
+                        ) : predictions ? (
+                          <>
+                            {/* 模型指标 */}
+                            <MetricsSummary
+                              status={predictions.status}
+                              metrics={predictions.metrics}
+                              trainedAt={predictions.trained_at}
+                              predictionDate={predictions.prediction_date}
+                              trainPeriod={predictions.train_period}
+                              testPeriod={predictions.test_period}
+                              modelName={
+                                options?.models.find((m) => m.key === predictions.model)
+                                  ?.label ?? predictions.model
+                              }
+                            />
 
                           {/* 训练失败但旧结果可用的提示 */}
-                          {predictionsError && predictions && (
-                            <DataError
-                              message="训练失败，当前显示最近成功结果"
-                              detail={predictionsError}
-                              stale
-                            />
-                          )}
+                            {predictionsError && predictions && (
+                              <DataError
+                                message="训练失败，当前显示最近成功结果"
+                                detail={predictionsError}
+                                stale
+                              />
+                            )}
 
                           {/* Top 10 表格（仅在非 invalid 时显示） */}
-                          {hasPredictions ? (
-                            <PotentialTable
-                              rows={predictions.items}
-                              onSelect={openStock}
-                            />
-                          ) : (
-                            <EmptyResult description="模型未通过有效性检查，暂无排名" />
-                          )}
-                        </>
-                      ) : (
-                        <EmptyResult description="尚未运行模型，请配置因子并点击训练" />
-                      )
-                    ) : market ? (
-                      <>
-                        <ScreenerFilters
-                          value={filters}
-                          onChange={setFilters}
-                          hasModel={hasPredictions}
-                        />
-                        <ScreenerTable
-                          stocks={market.stocks}
-                          filters={filters}
-                          onSelect={openStock}
-                        />
-                      </>
-                    ) : null}
+                            {hasPredictions ? (
+                              <PotentialTable
+                                rows={predictions.items}
+                                onSelect={openStock}
+                              />
+                            ) : (
+                              <EmptyResult description="模型未通过有效性检查，暂无排名" />
+                            )}
+                          </>
+                        ) : (
+                          <EmptyResult description="尚未运行模型，请配置因子并点击训练" />
+                        )}
+                      </Card>
+                    </Col>
+                  </Row>
+                ) : market ? (
+                  <Card className="workspace-card screener-workspace" title="成分股行情">
+                    <ScreenerFilters
+                      value={filters}
+                      onChange={setFilters}
+                      hasModel={hasPredictions}
+                    />
+                    <ScreenerTable
+                      stocks={market.stocks}
+                      filters={filters}
+                      onSelect={openStock}
+                    />
                   </Card>
-                </Col>
-              </Row>
+                ) : null}
+              </section>
             </>
           )}
 

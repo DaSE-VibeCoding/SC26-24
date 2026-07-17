@@ -20,7 +20,7 @@ export function PotentialTable({ rows, onSelect }: Props) {
       title: '#',
       dataIndex: 'rank',
       width: 48,
-      render: (v: number) => <span style={{ color: '#8FA1B8' }}>{v}</span>,
+      render: (v: number) => <span style={{ color: '#8E8E93' }}>{v}</span>,
     },
     {
       title: '股票',
@@ -51,7 +51,7 @@ export function PotentialTable({ rows, onSelect }: Props) {
         <Progress
           percent={v}
           size="small"
-          strokeColor="#6C7CFF"
+          strokeColor="#007AFF"
           format={() => formatPotentialScore(v)}
         />
       ),

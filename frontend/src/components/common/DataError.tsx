@@ -18,9 +18,9 @@ export function DataError({
     <Alert
       type={stale ? 'warning' : 'error'}
       showIcon
-      message={stale ? '数据刷新失败，当前显示最近缓存数据' : message}
+      title={stale ? '数据刷新失败，当前显示最近缓存数据' : message}
       description={
-        <Space direction="vertical" size="small">
+        <Space orientation="vertical" size="small">
           {detail && <span>{detail}</span>}
           {onRetry && (
             <Button size="small" onClick={onRetry} type={stale ? 'default' : 'primary'}>

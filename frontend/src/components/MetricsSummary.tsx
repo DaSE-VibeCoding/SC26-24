@@ -30,10 +30,10 @@ export function MetricsSummary({
         </Descriptions.Item>
         <Descriptions.Item label="Rank IC">{metrics.rank_ic.toFixed(4)}</Descriptions.Item>
         <Descriptions.Item label="IC 正值比例">
-          {metrics.ic_positive_ratio.toFixed(1)}%
+          {(metrics.ic_positive_ratio * 100).toFixed(1)}%
         </Descriptions.Item>
         <Descriptions.Item label="Top10 命中率">
-          {metrics.top10_hit_rate.toFixed(1)}%
+          {(metrics.top10_hit_rate * 100).toFixed(1)}%
         </Descriptions.Item>
         <Descriptions.Item label="Top10 超额收益">
           {metrics.top10_excess_return.toFixed(3)}
@@ -44,6 +44,9 @@ export function MetricsSummary({
         </Descriptions.Item>
         <Descriptions.Item label="测试区间">
           {testPeriod[0]} → {testPeriod[1]}
+        </Descriptions.Item>
+        <Descriptions.Item label="训练时间">
+          {new Date(trainedAt).toLocaleString('zh-CN')}
         </Descriptions.Item>
         <Descriptions.Item label="预测日期">{predictionDate}</Descriptions.Item>
       </Descriptions>

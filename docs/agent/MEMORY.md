@@ -187,13 +187,15 @@ _（暂无）_
 ## 已提交 Commit
 
 ```
+382c7e7 docs(agent): update execution plan and memory with Phase 1 completion
+1729864 feat(frontend): enhance screener filters and add tests
 462b30c feat(frontend): refactor app shell and all business components
 5b5249d feat(frontend): add design tokens, shared types, API layer, and format utilities
 fad1a1a feat(backend): align API schema and factor definitions with requirements doc
 b2a0271 docs(agent): add project context, execution plan, and memory
 ```
 
-分支：`feat/frontend-dashboard`，领先 `main` 4 commits
+分支：`feat/frontend-dashboard`，领先 `main` 6 commits
 
 ---
 
@@ -232,3 +234,15 @@ b2a0271 docs(agent): add project context, execution plan, and memory
 7. node_modules 未安装，需 `npm install`
 8. Agent 文档已创建：PROJECT_CONTEXT.md、EXECUTION_PLAN.md、MEMORY.md
 9. **当前状态：AWAITING_REVIEW，等待用户审核全部计划**
+
+---
+
+## Phase 2/3 完成总结（2026-07-17）
+
+1. ScreenerFilters 增强：展开式高级筛选面板（涨跌幅/20日收益/RSI/量比/潜力分范围滑块）
+2. MetricsSummary 修复：ic_positive_ratio、top10_hit_rate ×100 显示为百分比
+3. 新增 18 项 format.ts 单元测试（formatChangePct, formatPrice, formatPotentialScore 等）
+4. 新增 11 项组件测试（EmptyResult, DataError, LoadingSkeleton, MetricsSummary 各状态）
+5. 构建通过，全部 30 项测试通过（3 个测试文件）
+6. Phase 2（沪深300看盘）与 Phase 3（模型潜力榜）标记为 DONE
+7. 当前阶段：Phase 4 — 等待 D 的 StockDrawer/KlineChart 组件就绪

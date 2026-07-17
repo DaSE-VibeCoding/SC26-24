@@ -159,16 +159,52 @@ def stock_detail(symbol: str) -> StockDetail | None:
     stock = next((s for s in STOCKS if s.symbol == symbol), None)
     if stock is None:
         return None
+
+    import random
+    rng = random.Random(hash(symbol) & 0x7FFFFFFF)
+
     bars: list[Bar] = []
     today = date.today()
-    for offset in range(180, 0, -1):
-        base = stock.price * (0.85 + (180 - offset) * 0.0008 + sin(offset / 7) * 0.03)
+
+    # 用随机游走生成更真实的 K 线
+    # 从当前价格的 ~70% 开始，沿趋势波动到当前价格
+    start_price = stock.price * 0.7
+    end_price = stock.price
+    days = 180
+    drift = (end_price - start_price) / days
+
+    price = start_price
+    for i in range(days):
+        # 每日波动约 ±2%
+        daily_ret = rng.gauss(mu=drift / price, sigma=0.018)
+        close = price * (1 + daily_ret)
+        # 日内振幅约 1-3%
+        amplitude = abs(rng.gauss(mu=0.012, sigma=0.006))
+        high = close * (1 + amplitude * rng.random())
+        low = close * (1 - amplitude * rng.random())
+        open_p = low + rng.random() * (high - low)
+
+        # 确保 OHLC 逻辑正确: high >= max(open,close), low <= min(open,close)
+        real_high = max(open_p, close, high)
+        real_low = min(open_p, close, low)
+
+        # 成交量：基础量 + 波动放大 + 随机噪声
+        base_vol = 5_000_000 + abs(daily_ret) * 50_000_000
+        volume = max(100_000, round(rng.gauss(mu=base_vol, sigma=base_vol * 0.3), 0))
+
+        trade_dt = today - timedelta(days=days - i)
+        # 跳过周末
+        while trade_dt.weekday() >= 5:
+            trade_dt -= timedelta(days=1)
+
         bars.append(Bar(
-            trade_date=today - timedelta(days=offset),
-            open=round(base * 0.995, 2), high=round(base * 1.018, 2),
-            low=round(base * 0.982, 2), close=round(base, 2),
-            volume=round(8_000_000 + sin(offset) * 1_800_000, 0),
+            trade_date=trade_dt,
+            open=round(open_p, 2), high=round(real_high, 2),
+            low=round(real_low, 2), close=round(close, 2),
+            volume=volume,
         ))
+        price = close
+
     return StockDetail(
         snapshot=stock,
         bars=bars,

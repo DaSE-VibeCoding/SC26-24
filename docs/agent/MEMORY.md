@@ -187,15 +187,17 @@ _（暂无）_
 ## 已提交 Commit
 
 ```
-382c7e7 docs(agent): update execution plan and memory with Phase 1 completion
+73ebd94 docs(agent): mark Phase 2 and Phase 3 as complete
 1729864 feat(frontend): enhance screener filters and add tests
+7b8414c feat(frontend): implement professional K-line chart with MA and volume
+382c7e7 docs(agent): update execution plan and memory
 462b30c feat(frontend): refactor app shell and all business components
 5b5249d feat(frontend): add design tokens, shared types, API layer, and format utilities
 fad1a1a feat(backend): align API schema and factor definitions with requirements doc
 b2a0271 docs(agent): add project context, execution plan, and memory
 ```
 
-分支：`feat/frontend-dashboard`，领先 `main` 6 commits
+分支：`feat/frontend-dashboard`，领先 `main` 8 commits
 
 ---
 
@@ -245,4 +247,10 @@ b2a0271 docs(agent): add project context, execution plan, and memory
 4. 新增 11 项组件测试（EmptyResult, DataError, LoadingSkeleton, MetricsSummary 各状态）
 5. 构建通过，全部 30 项测试通过（3 个测试文件）
 6. Phase 2（沪深300看盘）与 Phase 3（模型潜力榜）标记为 DONE
-7. 当前阶段：Phase 4 — 等待 D 的 StockDrawer/KlineChart 组件就绪
+7. 当前阶段：Phase 4 — 等待 D 的 StockDrawer 组件就绪
+8. KlineChart 已重构为专业 K 线图（用户直接授权修改，原属 D）：
+   - 双面板：蜡烛图+MA20/MA60（上方55%）+ 成交量柱状图（下方14%）
+   - MA20（黄色）/ MA60（紫色）前端实时计算
+   - 成交量红涨绿跌着色
+   - DataZoom 滚轮+滑块、十字光标、图例切换 MA 线
+   - Mock K 线数据改为随机游走，OHLC 逻辑正确

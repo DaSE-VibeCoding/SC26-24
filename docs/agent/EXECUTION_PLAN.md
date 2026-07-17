@@ -301,12 +301,18 @@ Phase 3 所有任务在 Phase 1 中已一次性实现：
 
 ## Phase 4：与 D 的组件及 API 集成
 
-### 目标
+### 已完成
 
-- 接入 D 的 StockDrawer（A 提供入口和状态）
-- 对接真实 API Adapter
-- 处理 409、超时和非法字段
-- 避免覆盖 D 的代码
+- KlineChart 重构为专业 K 线图（用户直接授权，原属 D）：
+  - 双面板布局 + MA20/MA60 客户端计算 + 成交量着色 + DataZoom + 十字光标
+- API 超时/409/错误处理已在 api.ts 中实现
+- StockDrawer 入口（App.tsx 中的 selectedSymbol + drawerOpen + openStock）已就绪
+
+### 待完成
+
+- D 的 StockDrawer 内部实现
+- 真实 API Adapter（当前 Mock 模式已完备）
+- E2E 测试（D 负责）
 
 ### 前置条件
 

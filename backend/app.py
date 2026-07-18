@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings, get_settings
-from .data_service import DataService
+from .data_service import DataService, DataUnavailableError
 from .features import FACTOR_OPTIONS
 from .models import MODEL_OPTIONS
 from .predictor import Predictor
@@ -24,20 +24,24 @@ def health():
 
 
 @app.get("/api/status")
-def api_status(settings: Settings = Depends(get_settings)):
-    return {"data_mode": settings.data_mode, "quantdash_configured": bool(settings.quantdash_token)}
+def api_status(service: DataService = Depends(get_data_service)):
+    return service.status()
 
 
 @app.post("/api/data/refresh")
-def refresh_data(settings: Settings = Depends(get_settings)):
-    if settings.data_mode == "mock":
-        return {"ok": True, "message": "Mock 数据无需刷新"}
-    return {"ok": True, "message": "数据刷新任务已触发"}
+def refresh_data(service: DataService = Depends(get_data_service)):
+    try:
+        return service.refresh()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/market", response_model=MarketResponse)
 def market(service: DataService = Depends(get_data_service)):
-    return service.get_market()
+    try:
+        return service.get_market()
+    except DataUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/model/options", response_model=OptionsResponse)
@@ -58,7 +62,10 @@ def latest_predictions():
 
 @app.get("/api/stocks/{symbol}", response_model=StockDetail)
 def get_stock(symbol: str, service: DataService = Depends(get_data_service)):
-    result = service.get_stock(symbol)
+    try:
+        result = service.get_stock(symbol)
+    except DataUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     if result is None:
         raise HTTPException(status_code=404, detail="股票不在当前沪深 300 快照中")
     return result

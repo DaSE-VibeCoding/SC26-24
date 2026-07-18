@@ -6,6 +6,10 @@ __pycache__/
 .env
 data/cache/*
 !data/cache/.gitkeep
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.log
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/

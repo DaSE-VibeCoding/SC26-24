@@ -19,7 +19,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from './api'
 import { MarketSummary } from './components/MarketSummary'
 import { MetricsSummary } from './components/MetricsSummary'
@@ -91,16 +91,13 @@ export default function App() {
   useEffect(() => {
     let cancelled = false
 
-    async function load() {
+    async function loadMarket() {
       setMarketLoading(true)
       setOptionsLoading(true)
-      setPredictionsLoading(true)
-
       try {
-        const [marketData, optionData, predictionData] = await Promise.all([
+        const [marketData, optionData] = await Promise.all([
           api.market(),
           api.options(),
-          api.latestPredictions(),
         ])
         if (cancelled) return
 
@@ -112,31 +109,42 @@ export default function App() {
           .filter((f) => f.default_selected)
           .map((f) => f.key)
         setFactors(defaults)
-
-        setPredictions(predictionData)
-        setLastTrained({
-          model: predictionData.model,
-          factors: predictionData.factors,
-        })
-        // 同步模型选择为最近一次成功的模型
-        setModel(predictionData.model as ModelKey)
-        setPredictionsError(undefined)
       } catch (error) {
         if (cancelled) return
         const msg = error instanceof ApiError ? error.message : '加载失败'
         setMarketError(msg)
-        setPredictionsError(msg)
         message.error(msg)
       } finally {
         if (!cancelled) {
           setMarketLoading(false)
           setOptionsLoading(false)
-          setPredictionsLoading(false)
         }
       }
     }
 
-    load()
+    async function loadPredictions() {
+      setPredictionsLoading(true)
+      try {
+        const predictionData = await api.latestPredictions()
+        if (cancelled) return
+        setPredictions(predictionData)
+        setLastTrained({
+          model: predictionData.model,
+          factors: predictionData.factors,
+        })
+        setModel(predictionData.model as ModelKey)
+        setPredictionsError(undefined)
+      } catch (error) {
+        if (cancelled) return
+        const msg = error instanceof ApiError ? error.message : '模型加载失败'
+        setPredictionsError(msg)
+      } finally {
+        if (!cancelled) setPredictionsLoading(false)
+      }
+    }
+
+    loadMarket()
+    loadPredictions()
     return () => { cancelled = true }
   }, [])
 
@@ -199,6 +207,22 @@ export default function App() {
   // ── 渲染 ──────────────────────────────────────────
 
   const hasPredictions = predictions != null && predictions.status !== 'invalid'
+  const screenerStocks = useMemo(() => {
+    if (!market) return []
+    const predictionBySymbol = new Map(
+      predictions?.items.map((item) => [item.symbol, item]) ?? [],
+    )
+    return market.stocks.map((stock) => {
+      const prediction = predictionBySymbol.get(stock.symbol)
+      return prediction
+        ? {
+            ...stock,
+            potential_score: prediction.potential_score,
+            predicted_excess_20: prediction.predicted_excess_20,
+          }
+        : stock
+    })
+  }, [market, predictions])
   const isMock = market?.status.is_mock
   const dataDate = market?.status.latest_trade_date ?? market?.status.as_of
 
@@ -222,6 +246,11 @@ export default function App() {
             {isMock && (
               <Tag color="orange" style={{ margin: 0 }}>
                 Mock 数据
+              </Tag>
+            )}
+            {market && !isMock && (
+              <Tag color="green" style={{ margin: 0 }}>
+                QuantDash · {market.stocks.length} 只
               </Tag>
             )}
             {market?.status.constituents_date && (
@@ -408,7 +437,7 @@ export default function App() {
                       hasModel={hasPredictions}
                     />
                     <ScreenerTable
-                      stocks={market.stocks}
+                      stocks={screenerStocks}
                       filters={filters}
                       onSelect={openStock}
                     />

@@ -37,7 +37,7 @@ export function ScreenerTable({ stocks, filters, onSelect }: Props) {
       // 20 日收益范围
       if (
         s.ret_20 != null &&
-        (s.ret_20 * 100 < filters.ret20Range[0] || s.ret_20 * 100 > filters.ret20Range[1])
+        (s.ret_20 < filters.ret20Range[0] || s.ret_20 > filters.ret20Range[1])
       )
         return false
 
@@ -72,6 +72,7 @@ export function ScreenerTable({ stocks, filters, onSelect }: Props) {
         return false
 
       // 模型筛选
+      if (filters.modelFilter === 'top10' && s.potential_score == null) return false
       if (filters.modelFilter === 'positive' && (s.predicted_excess_20 ?? 0) <= 0) return false
 
       return true

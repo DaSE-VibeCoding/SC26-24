@@ -7,7 +7,7 @@ from .config import Settings, get_settings
 from .data_service import DataService, DataUnavailableError
 from .features import FACTOR_OPTIONS
 from .models import MODEL_OPTIONS
-from .predictor import Predictor
+from .predictor import PredictionUnavailableError, Predictor
 from .schemas import MarketResponse, OptionsResponse, PredictionResponse, StockDetail, TrainRequest
 
 app = FastAPI(title="AlphaScope API", version="0.1.0")
@@ -50,14 +50,20 @@ def options():
 
 
 @app.post("/api/model/train-and-predict", response_model=PredictionResponse)
-def train_and_predict(request: TrainRequest):
-    return Predictor().run(request)
+def train_and_predict(request: TrainRequest, settings: Settings = Depends(get_settings)):
+    try:
+        return Predictor(settings).run(request)
+    except PredictionUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/predictions/latest", response_model=PredictionResponse)
-def latest_predictions():
+def latest_predictions(settings: Settings = Depends(get_settings)):
     from .features import DEFAULT_FACTORS
-    return Predictor().run(TrainRequest(factors=DEFAULT_FACTORS))
+    try:
+        return Predictor(settings).run(TrainRequest(factors=DEFAULT_FACTORS))
+    except PredictionUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/stocks/{symbol}", response_model=StockDetail)

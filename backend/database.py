@@ -307,6 +307,25 @@ class MarketDatabase:
             ).fetchall()
         return [dict(row) for row in reversed(rows)]
 
+    def get_all_bars(
+        self,
+        *,
+        adjust_type: str = "forward",
+    ) -> dict[str, list[dict[str, Any]]]:
+        """Return the complete local history grouped by symbol for model training."""
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT symbol, trade_date, timestamp_ms, open, high, low, close,
+                       volume, amount
+                FROM daily_bars
+                WHERE adjust_type = ?
+                ORDER BY symbol, trade_date
+                """,
+                (adjust_type,),
+            ).fetchall()
+        return self._group_bars(rows)
+
     def stats(self) -> dict[str, Any]:
         with self.connect() as connection:
             summary = connection.execute(

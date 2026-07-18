@@ -1,9 +1,11 @@
 from fastapi.testclient import TestClient
 
 from backend.app import app
+from backend.config import Settings, get_settings
 from backend.features import DEFAULT_FACTORS
 
 
+app.dependency_overrides[get_settings] = lambda: Settings(_env_file=None, data_mode="mock")
 client = TestClient(app)
 
 

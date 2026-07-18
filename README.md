@@ -43,6 +43,14 @@ MARKET_HISTORY_DAYS=365
 .\.venv\Scripts\python.exe scripts\refresh_data.py
 ```
 
+如果只想验证 API Key、SDK 方法和返回字段，不写入数据库，可运行单股票只读探针：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\refresh_data.py probe 600519.SH 10
+```
+
+也可以显式使用 `sync` 子命令，例如 `scripts\refresh_data.py sync --force`；省略子命令时仍默认执行同步，兼容原有命令。
+
 同步器会优先使用 QuantDash 批量接口；相同股票和交易日会执行更新插入，因此命令可重复运行。数据库包含：
 
 若当前 QuantDash 套餐未开放批量日 K 线，程序会自动回退为单股请求并按套餐的 `10 次/分钟` 配额限速。300 只股票首次同步约需 30 分钟，每 10 只会立即写库；中断后重新执行同一命令会复用已经完整同步的股票。使用 `--force` 可强制全量覆盖。
@@ -63,7 +71,7 @@ MARKET_HISTORY_DAYS=365
 
 ## 协作约定
 
-四位成员分别使用 `feat/frontend-dashboard`、`feat/data-quantdash`、`feat/factor-model`、`feat/backend-integration` 分支，通过 Pull Request 合并到 `main`。禁止直接向 `main` 推送功能代码。
+当前交付版本统一维护在 `main`。合入队友分支前先检查独立提交和冲突，完成适配与测试后直接提交并推送 `main`；只有明确需要代码评审时才额外创建功能分支或 Pull Request。
 
 本项目只用于技术演示，不构成投资建议。
 
